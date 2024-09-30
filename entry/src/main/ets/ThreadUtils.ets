@@ -47,11 +47,17 @@ export class ThreadUtils {
     })
   }
 
+  lastTask:taskpool.Task | undefined
   flag = false
   async product(log: string):Promise<boolean> {
     return new Promise<boolean>((resolve,reject)=>{
       let newLog = log
       let task = new taskpool.Task(producer, this.i32a, this.ui8, newLog)
+      if (this.lastTask) {
+        task.addDependency(this.lastTask)
+      }
+
+      this.lastTask = task
       task.onReceiveData((success: boolean) => {
         if (!success) {
           this.flag = true
